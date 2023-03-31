@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.net.URL;
+import java.net.MalformedURLException;
 
 import static burp.BurpExtender.mStdOut;
 import static burp.utils.Constants.LOG_FORMAT;
@@ -33,14 +35,33 @@ public class TaskRepository {
     public boolean notDuplicate(TaskName taskName, String url, byte[] hash) {
         String normalizedURL = Task.normalizeURL(url);
         for (Task task : getTasks()) {
-            if (Arrays.equals(task.getHash(), hash)
-                    && task.getUrl().equals(normalizedURL)
-                    && task.getName().equals(taskName)) {
-                // If task failed -> Re-Scan / Not duplicate.
-                return task.getStatus().equals(TaskStatus.FAILED);
+            // don't check hash for secrets scan if not .js or .json URL
+            if (taskName == TaskName.SECRETS_SCAN && !isJsOrJsonUrl(normalizedURL)) {
+                if (task.getUrl().equals(normalizedURL)
+                        && task.getName().equals(taskName)) {
+                    // If task failed -> Re-Scan / Not duplicate.
+                    return task.getStatus().equals(TaskStatus.FAILED);
+                }
+            } else {
+                if (Arrays.equals(task.getHash(), hash)
+                        && task.getUrl().equals(normalizedURL)
+                        && task.getName().equals(taskName)) {
+                    // If task failed -> Re-Scan / Not duplicate.
+                    return task.getStatus().equals(TaskStatus.FAILED);
+                }
             }
         }
         return true;
+    }
+
+    private boolean isJsOrJsonUrl(String urlString) {
+        try {
+            URL url = new URL(urlString);
+            String path = url.getPath();
+            return path.endsWith(".js") || path.endsWith(".json");
+        } catch (MalformedURLException e) {
+            return false;
+        }
     }
 
     public Task findTaskByUUID(UUID taskUUID) {

@@ -33,6 +33,7 @@ public final class Utilities {
     public static boolean isValidScanTarget(IHttpRequestResponse baseRequestResponse, String[] queryFileExtensions) {
         if (baseRequestResponse.getResponse() != null && BurpExtender.isLoaded()) {
             for (String fileExtension: queryFileExtensions) {
+                if (fileExtension == "it's valid bruv") return true;
                 if (helpers.analyzeRequest(baseRequestResponse).getUrl().getPath().endsWith("." + fileExtension)) {
                     return true;
                 }

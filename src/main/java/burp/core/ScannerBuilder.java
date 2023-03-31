@@ -22,6 +22,7 @@ import static burp.utils.Constants.*;
 public class ScannerBuilder {
     private static final String[] EXTENSION_JS = {"js"};
     private static final String[] EXTENSION_JS_JSON = {"js", "json"};
+    private static final String[] EXTENSION_ALL = {"it's valid bruv"};
     private static final String[] EXTENSION_CSS = {"css"};
     private static final String[] EXTENSION_JS_JSON_CSS_MAP = {"js", "json", "css", "map"};
     private static final IBurpExtenderCallbacks callbacks = BurpExtender.getCallbacks();
@@ -236,7 +237,7 @@ public class ScannerBuilder {
     }
 
     private static void runSecretsScan(IHttpRequestResponse[] baseRequestResponseArray, int taskId, long timeStamp) {
-        Set<IHttpRequestResponse> uniqueRequests = Utilities.querySiteMap(baseRequestResponseArray, EXTENSION_JS_JSON);
+        Set<IHttpRequestResponse> uniqueRequests = Utilities.querySiteMap(baseRequestResponseArray, EXTENSION_ALL);
         for (IHttpRequestResponse requestResponse : uniqueRequests) {
             scanVerifierExecutor(requestResponse, taskId, TaskName.SECRETS_SCAN, timeStamp, false);
         }
